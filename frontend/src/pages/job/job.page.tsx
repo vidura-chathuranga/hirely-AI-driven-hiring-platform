@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
@@ -88,9 +89,9 @@ const JobPage = () => {
             />
           </div>
         ))}
-        <button type="submit" className="mt-8 bg-card text-card-foreground">
+        <Button type="submit" className="mt-8 bg-card text-card-foreground">
           Submit
-        </button>
+        </Button>
       </form>
     </div>
   );
