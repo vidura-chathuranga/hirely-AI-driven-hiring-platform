@@ -3,10 +3,18 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 
 import { Briefcase, MapPin } from "lucide-react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { useParams } from "react-router-dom";
 
 const JobPage = () => {
   const { id: jobId } = useParams();
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    a1: "",
+    a2: "",
+    a3: "",
+  });
 
   const job = {
     title: "Intern - Software Engineer",
@@ -21,7 +29,17 @@ const JobPage = () => {
     ],
   };
 
-  const handleSubmit = async () => {};
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    console.log(formData);
+  };
   return (
     <div>
       <div>
@@ -46,9 +64,9 @@ const JobPage = () => {
           <h3>Full Name</h3>
           <Input
             className="mt-2"
-            name="fullname"
-            // value={FormData.fullname}
-            // onChange={handleChange}
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
             required
           />
         </div>
@@ -65,10 +83,14 @@ const JobPage = () => {
               //       `a${index + 1}` as keyof Omit<keyof formData, "fullName">
               //     ]
               //   }
+              onChange={handleChange}
               required
             />
           </div>
         ))}
+        <button type="submit" className="mt-8 bg-card text-card-foreground">
+          Submit
+        </button>
       </form>
     </div>
   );
