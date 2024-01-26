@@ -1,13 +1,11 @@
-import Navigation from "@/components/shared/Navigation"
-import { Outlet } from "react-router-dom"
+import { Outlet } from "react-router-dom";
 
 const RootLayout = () => {
   return (
     <main className="container">
-        <Navigation/>
-        <Outlet/>
+      <Outlet />
     </main>
-  )
-}
+  );
+};
 
-export default RootLayout
+export default RootLayout;
