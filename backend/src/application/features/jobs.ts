@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 
 export const getJobs = async (req: Request, res: Response) => {
   try {
@@ -23,6 +23,7 @@ export const getJobs = async (req: Request, res: Response) => {
 };
 
 export const createJob = async (req: Request, res: Response) => {
+  console.log(req.emit);
   try {
     return res.status(200).send();
   } catch (error) {
