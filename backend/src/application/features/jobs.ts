@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import Job from "../../persistance/entities/jobs";
 
 export const getJobs = async (req: Request, res: Response) => {
   try {
@@ -23,10 +24,17 @@ export const getJobs = async (req: Request, res: Response) => {
 };
 
 export const createJob = async (req: Request, res: Response) => {
-  console.log(req.emit);
   try {
-    return res.status(200).send();
+    const { title, location, description, questions } = req.body;
+
+    if (!title || !location || !description) {
+      throw new Error("All fields are required");
+    }
+
+    const job = await Job.create({ title, location, description, questions });
+
+    res.status(201).json(job);
   } catch (error) {
-    return res.status(500).send();
+    res.status(500).send();
   }
 };
