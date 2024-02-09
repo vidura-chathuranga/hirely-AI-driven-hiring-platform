@@ -1,7 +1,8 @@
-import express from "express";
-import jobsRouter from "./api/jobs";
-import connectDB from "./persistance/db";
 import "dotenv/config";
+import express from "express";
+import connectDB from "./persistance/db";
+import jobsRouter from "./api/jobs";
+import jobAppplicationRouter from "./api/jobApplications";
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(express.json());
 connectDB();
 
 app.use("/jobs", jobsRouter);
+app.use("/jobApplications", jobAppplicationRouter);
+
 
 app.listen(8000, () => console.log("Server is listening on port 8000."));
- 
