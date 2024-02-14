@@ -2,13 +2,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-
-import { Briefcase, MapPin } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { Briefcase, Loader2, MapPin } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const JobPage = () => {
   const { id: jobId } = useParams();
+
+  const navigate = useNavigate();
+
+  // //initialize the query client
+  // const client = useQueryClient();
+  // client.invalidateQueries({ queryKey: ["job"], exact: true });
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -17,18 +24,30 @@ const JobPage = () => {
     a3: "",
   });
 
-  const job = {
-    title: "Intern - Software Engineer",
-    type: "Full-time",
-    location: "Remote",
-    description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Architecto possimus nemo in quis qui odio explicabo velit magni deserunt. Saepe porro molestias repellat accusamus! Cumque pariatur fugiat vel libero iste.",
-    questions: [
-      "What is your campus?",
-      "what is your favourite language?",
-      "How old are you?",
-    ],
-  };
+  // data fetching query
+  const {
+    data: job,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["job"],
+    queryFn: () => axios.get(`/api/jobs/${jobId}`).then((res) => res.data),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center">
+        <Loader2 size={40} className="animate-spin" />
+      </div>
+    );
+  }
+
+  // handling the fetching error
+  // todo : Needs to add a toast or message to the user
+  if (isError) {
+    console.log(error.message);
+  }
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -39,7 +58,22 @@ const JobPage = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log(formData);
+    try {
+      const res = await axios.post("/api/jobApplications", {
+        fullName: formData.fullName,
+        answers: [formData.a1, formData.a2, formData.a3],
+        userId: "testId",
+        job: jobId,
+      });
+
+      // todo : show success message to the user
+      console.log("success");
+      // navigate user to home page
+      navigate("/home", { replace: true });
+    } catch (error: any) {
+      // todo : show error notification to the user
+      console.log(error.message);
+    }
   };
   return (
     <div>
@@ -73,7 +107,7 @@ const JobPage = () => {
         </div>
 
         {/* job questions */}
-        {job.questions.map((ques, index) => (
+        {job.questions.map((ques: string[], index: number) => (
           <div key={index} className="mt-4">
             <h3>{ques}</h3>
             <Textarea

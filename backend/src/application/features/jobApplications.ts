@@ -5,7 +5,7 @@ export const createJobApplication = async (req: Request, res: Response) => {
   try {
     const { userId, fullName, job, answers, ratings } = req.body;
 
-    if (!userId || !fullName || !job || !answers || !ratings) {
+    if (!userId || !fullName || !job || !answers) {
       throw new Error("All fields are required");
     }
     const createdApplication = await JobApplication.create({
