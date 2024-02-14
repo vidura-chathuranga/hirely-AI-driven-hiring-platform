@@ -9,6 +9,11 @@ import SignUpPage from "./pages/sign-up.page.tsx";
 import MainLayout from "./layout/main.layout.tsx";
 import JobPage from "./pages/job/job.page.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import AdminMainLayout from "./layout/admin.layout.tsx";
+import JobCreatePage from "./pages/admin/createJob/job-create.page.tsx";
+import AdminJobPostsPage from "./pages/admin/jobPosts/admin-job-posts.page.tsx";
+import AdminJobPage from "./pages/admin/job/admin-job.page.tsx";
+import AdminJobApplicationPage from "./pages/admin/jobApplication/admin-job-application.page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +32,28 @@ const router = createBrowserRouter([
                 element: <JobPage />,
               },
             ],
+          },
+        ],
+      },
+      {
+        path: "admin",
+        element: <AdminMainLayout />,
+        children: [
+          {
+            path: "jobs",
+            element: <AdminJobPostsPage />,
+          },
+          {
+            path: "job/create",
+            element: <JobCreatePage />,
+          },
+          {
+            path: "job/:id",
+            element: <AdminJobPage />,
+          },
+          {
+            path: "job/:id/application/:applicationId",
+            element: <AdminJobApplicationPage />,
           },
         ],
       },
