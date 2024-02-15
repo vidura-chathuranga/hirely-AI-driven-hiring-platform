@@ -13,6 +13,10 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  type: {
+    type: String,
+    required: true,
+  },
   questions: {
     type: [String],
     default: [

@@ -5,21 +5,6 @@ import axios from "axios";
 import { Loader2 } from "lucide-react";
 
 const JobPostsSection = () => {
-  // const jobs = [
-  //   {
-  //     _id: "xyz",
-  //     title: "Intern - Software Engineer",
-  //     type: "Full-time",
-  //     location: "Remote",
-  //   },
-  //   {
-  //     _id: "abc",
-  //     title: "Software Engineer",
-  //     type: "Full-time",
-  //     location: "Remote",
-  //   },
-  // ];
-
   //
   const {
     isLoading,

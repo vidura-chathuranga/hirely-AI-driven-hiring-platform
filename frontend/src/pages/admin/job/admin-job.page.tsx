@@ -1,22 +1,44 @@
 import { Separator } from "@radix-ui/react-separator";
-import { Briefcase, MapPin } from "lucide-react";
+import { Briefcase, Loader2, MapPin } from "lucide-react";
 import JobApplicationCard from "./components/JobApplicationCard";
+import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const JobPage = () => {
-  const job = {
-    _id: "xyz",
-    title: "Intern - Software Engineer",
-    description:
-      "We are seeking a motivated and enthusiastic Software Engineering Intern to join our dynamic team. As a Software Engineering Intern, you will have the opportunity to work closely with experienced developers and contribute to real-world projects. This internship is designed to provide valuable hands-on experience, foster professional growth, and enhance your technical skills.",
-    type: "Full-time",
-    location: "Remote",
-    questions: [
-      "Share your academic background and highlight key programming concepts you've mastered. How has your education shaped your current tech skill set ?",
-      "Describe your professional development, emphasizing any certifications obtained. How have these certifications enriched your technical abilities, and can you provide an example of their practical application ?",
-      "Discuss notable projects in your programming experience. What challenges did you face, and how did you apply your skills to overcome them? Highlight the technologies used and the impact of these projects on your overall growth as a prefessional ?",
-    ],
-  };
+  const { id: jobId } = useParams();
 
+  const {
+    isLoading,
+    isError,
+    error,
+    data: job,
+  } = useQuery({
+    queryKey: ["jobs", "admin", jobId],
+    queryFn: () => axios.get(`/api/jobs/${jobId}`).then((res) => res.data),
+  });
+  // const job = {
+  //   _id: "xyz",
+  //   title: "Intern - Software Engineer",
+  //   description:
+  //     "We are seeking a motivated and enthusiastic Software Engineering Intern to join our dynamic team. As a Software Engineering Intern, you will have the opportunity to work closely with experienced developers and contribute to real-world projects. This internship is designed to provide valuable hands-on experience, foster professional growth, and enhance your technical skills.",
+  //   type: "Full-time",
+  //   location: "Remote",
+  //   questions: [
+  //     "Share your academic background and highlight key programming concepts you've mastered. How has your education shaped your current tech skill set ?",
+  //     "Describe your professional development, emphasizing any certifications obtained. How have these certifications enriched your technical abilities, and can you provide an example of their practical application ?",
+  //     "Discuss notable projects in your programming experience. What challenges did you face, and how did you apply your skills to overcome them? Highlight the technologies used and the impact of these projects on your overall growth as a prefessional ?",
+  //   ],
+  // };
+
+  // if the page is Loading we show the loader
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-4">
+        <Loader2 className="animate-spin" size={60} />
+      </div>
+    );
+  }
   const jobApplications = [
     {
       _id: "1",

@@ -22,13 +22,19 @@ export const createJob = async (
   next: NextFunction
 ) => {
   try {
-    const { title, location, description, questions } = req.body;
+    const { title, location, description, questions, type } = req.body;
 
-    if (!title || !location || !description) {
+    if (!title || !location || !description || !type) {
       throw new Error("All fields are required");
     }
 
-    const job = await Job.create({ title, location, description, questions });
+    const job = await Job.create({
+      title,
+      location,
+      description,
+      questions,
+      type,
+    });
 
     res.status(201).json(job);
   } catch (error) {
