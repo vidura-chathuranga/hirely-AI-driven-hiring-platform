@@ -14,6 +14,7 @@ import JobCreatePage from "./pages/admin/createJob/job-create.page.tsx";
 import AdminJobPostsPage from "./pages/admin/jobPosts/admin-job-posts.page.tsx";
 import AdminJobPage from "./pages/admin/job/admin-job.page.tsx";
 import AdminJobApplicationPage from "./pages/admin/jobApplication/admin-job-application.page.tsx";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const router = createBrowserRouter([
   {
@@ -76,6 +77,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={client}>
       <RouterProvider router={router} />
+      <ReactQueryDevtools />
     </QueryClientProvider>
   </React.StrictMode>
 );

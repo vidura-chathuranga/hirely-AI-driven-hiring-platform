@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Briefcase, Loader2, MapPin } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
@@ -12,10 +12,6 @@ const JobPage = () => {
   const { id: jobId } = useParams();
 
   const navigate = useNavigate();
-
-  // //initialize the query client
-  // const client = useQueryClient();
-  // client.invalidateQueries({ queryKey: ["job"], exact: true });
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -31,7 +27,7 @@ const JobPage = () => {
     isError,
     error,
   } = useQuery({
-    queryKey: ["job"],
+    queryKey: ["jobs", jobId],
     queryFn: () => axios.get(`/api/jobs/${jobId}`).then((res) => res.data),
   });
 

@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { QueryClient, useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const JobCreatePage = () => {
   const [formData, setFormData] = useState({
@@ -14,15 +18,34 @@ const JobCreatePage = () => {
     q3: "",
   });
 
+  const queryClient = new QueryClient();
+  const navigate = useNavigate();
+
+  const { isPending, mutate: createJob } = useMutation({
+    mutationFn: async () => {
+      return axios.post("/api/jobs", formData).then((res) => res.data);
+    },
+    onSuccess: (newJob) => {
+      queryClient.setQueryData(["jobs", newJob._id], newJob);
+      navigate("/admin/jobs");
+    },
+    onError: (error) => {
+      // show error to the user
+      console.log(error);
+    },
+  });
+
   const handleChange = (
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+
+    // mutate the tenstack mutation function
+    createJob();
   };
 
   return (
@@ -102,7 +125,12 @@ const JobCreatePage = () => {
           />
         </div>
 
-        <Button type="submit" className="mt-8 bg-card text-card-foreground">
+        <Button
+          type="submit"
+          className="mt-8 bg-card text-card-foreground flex gap-x-3"
+          disabled={isPending}
+        >
+          {isPending && <Loader2 className="animate-spin" />}
           Submit
         </Button>
       </form>
