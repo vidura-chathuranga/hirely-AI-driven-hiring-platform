@@ -5,6 +5,13 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
+type JobApplication = {
+  _id: string;
+  userId: string;
+  fullName: string;
+  answers: string[];
+  job: string;
+};
 const JobPage = () => {
   const { id: jobId } = useParams();
 
@@ -16,6 +23,17 @@ const JobPage = () => {
   } = useQuery({
     queryKey: ["jobs", "admin", jobId],
     queryFn: () => axios.get(`/api/jobs/${jobId}`).then((res) => res.data),
+  });
+
+  const {
+    data: jobApplications,
+    isLoading: applicationsLoading,
+    isError: isApplicationLoadingError,
+    error: applicationLoadingError,
+  } = useQuery({
+    queryKey: ["jobapplications", jobId],
+    queryFn: () =>
+      axios.get(`/api/jobApplications/job/${jobId}`).then((res) => res.data),
   });
   // const job = {
   //   _id: "xyz",
@@ -39,13 +57,17 @@ const JobPage = () => {
       </div>
     );
   }
-  const jobApplications = [
-    {
-      _id: "1",
-      fullName: "Vidura Chathuranga",
-      jobId: "xyz",
-    },
-  ];
+
+  if (isError) {
+    return <div>Jobs Fetching Error : {error.message}</div>;
+  }
+  // const jobApplications = [
+  //   {
+  //     _id: "1",
+  //     fullName: "Vidura Chathuranga",
+  //     jobId: "xyz",
+  //   },
+  // ];
   return (
     <div>
       <div>
@@ -73,14 +95,24 @@ const JobPage = () => {
       <div className="py-8">
         <h2>Job Applications</h2>
         <div className="mt-4 flex flex-col gap-y-4">
-          {jobApplications.map((application) => (
-            <JobApplicationCard
-              key={application._id}
-              fullName={application.fullName}
-              _id={application._id}
-              jobId={application.jobId}
-            />
-          ))}
+          {applicationsLoading ? (
+            <>
+              <div className="my-6 flex justify-center items-center">
+                <Loader2 className="animate-spin" />
+              </div>
+            </>
+          ) : isApplicationLoadingError ? (
+            <>{applicationLoadingError.message}</>
+          ) : (
+            jobApplications.map((application: JobApplication) => (
+              <JobApplicationCard
+                key={application._id}
+                fullName={application.fullName}
+                _id={application._id}
+                jobId={application.job}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

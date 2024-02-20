@@ -41,6 +41,22 @@ export const getAllJobApplications = async (
   }
 };
 
+export const getJobApplicationByJobId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id: jobId } = req.params;
+
+    const jobApplications = await JobApplication.find({ job: jobId });
+
+    res.status(200).json(jobApplications);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getJobApplicationById = async (
   req: Request,
   res: Response,

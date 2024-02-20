@@ -3,6 +3,7 @@ import {
   createJobApplication,
   getAllJobApplications,
   getJobApplicationById,
+  getJobApplicationByJobId,
 } from "../application/features/jobApplications";
 
 const jobAppplicationRouter = express.Router();
@@ -12,6 +13,7 @@ jobAppplicationRouter
   .post(createJobApplication)
   .get(getAllJobApplications);
 
+jobAppplicationRouter.route("/job/:id").get(getJobApplicationByJobId);
 jobAppplicationRouter.route("/:id").get(getJobApplicationById);
 
 export default jobAppplicationRouter;
