@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 import { QueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
@@ -8,6 +9,9 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const JobCreatePage = () => {
+  // toast hook
+  const { toast } = useToast();
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -28,9 +32,19 @@ const JobCreatePage = () => {
     onSuccess: (newJob) => {
       queryClient.setQueryData(["jobs", newJob._id], newJob);
       navigate("/admin/jobs");
+
+      // show success notification to the user
+      toast({
+        title: "Job posted Successfully",
+      });
     },
     onError: (error) => {
       // show error to the user
+      toast({
+        title: "oops, There was an error",
+        description: error.message,
+        variant: "destructive",
+      });
       console.log(error);
     },
   });
