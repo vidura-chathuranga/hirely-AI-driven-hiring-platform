@@ -105,10 +105,7 @@ const JobPage = () => {
           ) : isApplicationLoadingError ? (
             <>{applicationLoadingError.message}</>
           ) : jobApplications?.length === 0 ? (
-            // <div className="flex justify-center flex-col items-center my-10 text-gray-400 opacity-60">
-            //   <MonitorOff size={50} />
-            //   <h3 className="mt-5">No application found</h3>
-            // </div>
+            
             <NotFound
               message="No application found"
               icon={(props) => <MonitorOff size={50} />}
