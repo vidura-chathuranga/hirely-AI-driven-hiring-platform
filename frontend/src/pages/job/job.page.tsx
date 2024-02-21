@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@clerk/clerk-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -15,7 +16,11 @@ const JobPage = () => {
   // get user Id
   const user = useUser();
 
+  // initialize the navigate hook
   const navigate = useNavigate();
+
+  // toast hook
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -67,12 +72,19 @@ const JobPage = () => {
       });
 
       // todo : show success message to the user
-      console.log("success");
+
+      toast({
+        title: "Job application submitted successfully",
+      });
       // navigate user to home page
       navigate("/home", { replace: true });
     } catch (error: any) {
       // todo : show error notification to the user
-      console.log(error.message);
+      toast({
+        title: "Oops, There was an error",
+        description: error?.error || error?.data?.message,
+        variant: "destructive",
+      });
     }
   };
   return (
