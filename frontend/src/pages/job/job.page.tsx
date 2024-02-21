@@ -64,7 +64,7 @@ const JobPage = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post("/api/jobApplications", {
+      await axios.post("/api/jobApplications", {
         fullName: formData.fullName,
         answers: [formData.a1, formData.a2, formData.a3],
         userId: user.user?.id,
