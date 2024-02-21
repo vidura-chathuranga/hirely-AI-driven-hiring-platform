@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { useUser } from "@clerk/clerk-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Briefcase, Loader2, MapPin } from "lucide-react";
@@ -10,6 +11,9 @@ import { useParams, useNavigate } from "react-router-dom";
 
 const JobPage = () => {
   const { id: jobId } = useParams();
+
+  // get user Id
+  const user = useUser();
 
   const navigate = useNavigate();
 
@@ -58,7 +62,7 @@ const JobPage = () => {
       const res = await axios.post("/api/jobApplications", {
         fullName: formData.fullName,
         answers: [formData.a1, formData.a2, formData.a3],
-        userId: "testId",
+        userId: user.user?.id,
         job: jobId,
       });
 
