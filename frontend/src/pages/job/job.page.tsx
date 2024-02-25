@@ -17,15 +17,10 @@ const JobPage = () => {
   const { id: jobId } = useParams();
 
   // get user Id
-  const user = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
 
   // use Auth hook from Clerk
   const { getToken } = useAuth();
-
-  // useEffect to fetch the session Token
-  useEffect(() => {
-    getToken().then((res) => setTokenId(res));
-  }, [getToken]);
 
   // initialize the navigate hook
   const navigate = useNavigate();
@@ -39,6 +34,17 @@ const JobPage = () => {
     a2: "",
     a3: "",
   });
+
+  // useEffect to fetch the session Token ,
+  // if user not logged in then redirect to the sign in page
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      navigate(`/sign-in?redirect=${jobId}`, { replace: true });
+    } else {
+      getToken().then((res) => setTokenId(res));
+    }
+  }, [getToken, navigate, isSignedIn, isLoaded]);
 
   // data fetching query
   const {
@@ -80,7 +86,7 @@ const JobPage = () => {
         {
           fullName: formData.fullName,
           answers: [formData.a1, formData.a2, formData.a3],
-          userId: user.user?.id,
+          userId: user?.id,
           job: jobId,
         },
         {
