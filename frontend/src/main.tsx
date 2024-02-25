@@ -16,7 +16,7 @@ import AdminJobPage from "./pages/admin/job/admin-job.page.tsx";
 import AdminJobApplicationPage from "./pages/admin/jobApplication/admin-job-application.page.tsx";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "./components/ui/toaster.tsx";
-import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-react";
+import { ClerkProvider } from "@clerk/clerk-react";
 
 const router = createBrowserRouter([
   {
@@ -86,9 +86,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={client}>
       <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-        <ClerkLoaded>
-          <RouterProvider router={router} />
-        </ClerkLoaded>
+        <RouterProvider router={router} />
       </ClerkProvider>
       <Toaster />
       <ReactQueryDevtools />
