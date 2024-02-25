@@ -3,18 +3,29 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Briefcase, Loader2, MapPin } from "lucide-react";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 const JobPage = () => {
+  // store session token Id
+  const [tokenId, setTokenId] = useState<String | null>("");
+
   const { id: jobId } = useParams();
 
   // get user Id
   const user = useUser();
+
+  // use Auth hook from Clerk
+  const { getToken } = useAuth();
+
+  // useEffect to fetch the session Token
+  useEffect(() => {
+    getToken().then((res) => setTokenId(res));
+  }, [getToken]);
 
   // initialize the navigate hook
   const navigate = useNavigate();
@@ -64,12 +75,20 @@ const JobPage = () => {
     e.preventDefault();
 
     try {
-      await axios.post("/api/jobApplications", {
-        fullName: formData.fullName,
-        answers: [formData.a1, formData.a2, formData.a3],
-        userId: user.user?.id,
-        job: jobId,
-      });
+      await axios.post(
+        "/api/jobApplications",
+        {
+          fullName: formData.fullName,
+          answers: [formData.a1, formData.a2, formData.a3],
+          userId: user.user?.id,
+          job: jobId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenId}`,
+          },
+        }
+      );
 
       // todo : show success message to the user
 
