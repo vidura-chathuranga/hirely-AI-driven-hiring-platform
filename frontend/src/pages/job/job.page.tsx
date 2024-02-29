@@ -102,7 +102,7 @@ const JobPage = () => {
         title: "Job application submitted successfully",
       });
       // navigate user to home page
-      navigate("/home", { replace: true });
+      navigate("/", { replace: true });
     } catch (error: any) {
       // todo : show error notification to the user
       toast({
