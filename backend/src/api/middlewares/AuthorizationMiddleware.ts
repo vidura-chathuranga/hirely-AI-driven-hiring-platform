@@ -6,7 +6,7 @@ const AuthorizationMiddleware = (
   next: NextFunction
 ) => {
   const userRole = req.query.role || "NO_USER_ROLE";
-
+  
   // // @ts-ignore
   if (userRole !== "admin") {
     throw new ForbiddenError("Access denied");

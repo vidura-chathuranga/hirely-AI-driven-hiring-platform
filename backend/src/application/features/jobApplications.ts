@@ -78,7 +78,8 @@ export const getJobApplicationById = async (
       throw new NotFoundError("Job application not found");
     }
     res.status(200).json(jobApplication);
-  } catch (error) {
+  } catch (error:any) {
+    console.log(error.message)
     next(error);
   }
 };
