@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import NotFound from "@/components/shared/NotFound";
-import { useAuth, useSession, useUser } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
 
 type JobApplication = {
@@ -117,7 +117,7 @@ const JobPage = () => {
           ) : jobApplications?.length === 0 ? (
             <NotFound
               message="No application found"
-              icon={(props) => <MonitorOff size={50} />}
+              icon={(_) => <MonitorOff size={50} />}
             />
           ) : (
             jobApplications.map((application: JobApplication) => (
