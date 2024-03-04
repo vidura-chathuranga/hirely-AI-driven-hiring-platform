@@ -5,8 +5,10 @@ const AuthorizationMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  //@ts-ignore
-  if (req.auth.claims.metadata.role !== "admin") {
+  const userRole = req.query.role || "NO_USER_ROLE";
+
+  // // @ts-ignore
+  if (userRole !== "admin") {
     throw new ForbiddenError("Access denied");
   }
   next();

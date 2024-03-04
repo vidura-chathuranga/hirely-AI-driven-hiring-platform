@@ -13,11 +13,11 @@ const jobAppplicationRouter = express.Router();
 jobAppplicationRouter
   .route("/")
   .post(ClerkExpressRequireAuth({}), createJobApplication)
-  .get(
-    ClerkExpressRequireAuth({}),
-    AuthorizationMiddleware,
-    getAllJobApplications
-  );
+  // .get(
+  //   ClerkExpressRequireAuth({}),
+  //   AuthorizationMiddleware,
+  //   getAllJobApplications
+  // );
 
 jobAppplicationRouter
   .route("/job/:id")

@@ -5,6 +5,8 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import NotFound from "@/components/shared/NotFound";
+import { useAuth, useSession, useUser } from "@clerk/clerk-react";
+import { useEffect, useState } from "react";
 
 type JobApplication = {
   _id: string;
@@ -15,6 +17,24 @@ type JobApplication = {
 };
 const JobPage = () => {
   const { id: jobId } = useParams();
+
+  const [userToken, setUserToken] = useState<String | null>(null);
+
+  // get the user Token
+  const { getToken } = useAuth();
+
+  // get user data
+  const {user} = useUser();
+
+  useEffect(() => {
+    const fetchUserToken = async () => {
+      const token = await getToken();
+
+      setUserToken(token);
+    };
+
+    fetchUserToken();
+  }, []);
 
   const {
     isLoading,
@@ -34,21 +54,16 @@ const JobPage = () => {
   } = useQuery({
     queryKey: ["jobapplications", jobId],
     queryFn: () =>
-      axios.get(`/api/jobApplications/job/${jobId}`).then((res) => res.data),
+      axios
+        .get(`/api/jobApplications/job/${jobId}`, {
+          headers: { Authorization: `Bearer ${userToken}` },
+          params : {
+            role : user?.publicMetadata.role
+          }
+        })
+        .then((res) => res.data),
+    enabled : userToken !== null
   });
-  // const job = {
-  //   _id: "xyz",
-  //   title: "Intern - Software Engineer",
-  //   description:
-  //     "We are seeking a motivated and enthusiastic Software Engineering Intern to join our dynamic team. As a Software Engineering Intern, you will have the opportunity to work closely with experienced developers and contribute to real-world projects. This internship is designed to provide valuable hands-on experience, foster professional growth, and enhance your technical skills.",
-  //   type: "Full-time",
-  //   location: "Remote",
-  //   questions: [
-  //     "Share your academic background and highlight key programming concepts you've mastered. How has your education shaped your current tech skill set ?",
-  //     "Describe your professional development, emphasizing any certifications obtained. How have these certifications enriched your technical abilities, and can you provide an example of their practical application ?",
-  //     "Discuss notable projects in your programming experience. What challenges did you face, and how did you apply your skills to overcome them? Highlight the technologies used and the impact of these projects on your overall growth as a prefessional ?",
-  //   ],
-  // };
 
   // if the page is Loading we show the loader
   if (isLoading) {
@@ -83,11 +98,6 @@ const JobPage = () => {
             <span>{job?.location}</span>
           </div>
         </div>
-        {/* <div className="gap-x-4 flex items-center mt-4">
-        <Badge>NodeJS</Badge>
-        <Badge>ReactJS</Badge>
-        <Badge>AWS</Badge>
-      </div> */}
       </div>
       <div className="mt-4 py-4">
         <p>{job?.description}</p>
@@ -105,7 +115,6 @@ const JobPage = () => {
           ) : isApplicationLoadingError ? (
             <>{applicationLoadingError.message}</>
           ) : jobApplications?.length === 0 ? (
-            
             <NotFound
               message="No application found"
               icon={(props) => <MonitorOff size={50} />}
