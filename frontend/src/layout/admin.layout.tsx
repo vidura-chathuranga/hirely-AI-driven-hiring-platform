@@ -32,7 +32,7 @@ const AdminMainLayout = () => {
             <Link to={"/admin/job/create"}>Post A Job</Link>
           </Button>
           <SignedIn>
-            <UserButton afterSignOutUrl="/sign-in?redirect=lgout" />
+            <UserButton afterSignOutUrl="/sign-in?redirect=admin" />
           </SignedIn>
         </div>
       </div>
