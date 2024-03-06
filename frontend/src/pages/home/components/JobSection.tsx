@@ -2,7 +2,6 @@ import JobCard from "@/components/shared/JobCard";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-import JobType from "../../../types/job";
 
 const JobSection = () => {
   const {
