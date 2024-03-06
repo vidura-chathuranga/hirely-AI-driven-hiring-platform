@@ -8,10 +8,27 @@ const SignInPage = () => {
 
   const redirect = searchParams.get("redirect");
 
+  // settings up redirect URL
+  let redirectUrl;
+  if(!redirect){
+    redirectUrl = '/';
+  }else if(redirect === 'admin'){
+    redirectUrl = '/admin/jobs'
+  }else{
+    redirectUrl = `jobs/${redirect}`
+  }
+
   return (
     <div className="flex flex-col justify-center items-center min-h-screen gap-y-10">
       <div className="flex justify-center w-[100%]">
-        {redirect && (
+        {redirect === 'admin'? (
+          <CustomAlert
+          title={"Login Required"}
+          description={
+            "It looks like you need to be logged in to view this jobs as a admininstrator. Please log in or sign up to access it."
+          }
+        />
+        ): redirectUrl !== '/' && (
           <CustomAlert
             title={"Login Required to View Job"}
             description={
@@ -21,8 +38,8 @@ const SignInPage = () => {
         )}
       </div>
       <SignIn
-        afterSignInUrl={redirect ? `jobs/${redirect}` : "/"}
-        afterSignUpUrl={redirect ? `jobs/${redirect}` : "/"}
+        afterSignInUrl={redirectUrl}
+        afterSignUpUrl={redirectUrl}
         signUpUrl="/sign-up"
       />
     </div>
