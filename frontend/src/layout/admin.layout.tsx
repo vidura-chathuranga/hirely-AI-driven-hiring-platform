@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useUser } from "@clerk/clerk-react";
+import { SignedIn, UserButton, useUser } from "@clerk/clerk-react";
 import { useEffect } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
@@ -19,12 +19,24 @@ const AdminMainLayout = () => {
 
   return (
     <div>
-      <div className="flex justify-end items-center py-4 gap-3">
-        <Link to={"/admin/jobs"}>Job Posts</Link>
-        <Button asChild>
-          <Link to={"/admin/job/create"}>Post A Job</Link>
-        </Button>
+      <div className="flex py-5 justify-between items-center">
+        <Link
+          to={"/admin/jobs"}
+          className="text-4xl font-medium text-underlay-1"
+        >
+          HirelyAI
+        </Link>
+        <div className="flex justify-end items-center py-4 gap-3">
+          <Link to={"/admin/jobs"}>Job Posts</Link>
+          <Button asChild>
+            <Link to={"/admin/job/create"}>Post A Job</Link>
+          </Button>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/sign-in?redirect=lgout" />
+          </SignedIn>
+        </div>
       </div>
+
       <Outlet />
     </div>
   );
