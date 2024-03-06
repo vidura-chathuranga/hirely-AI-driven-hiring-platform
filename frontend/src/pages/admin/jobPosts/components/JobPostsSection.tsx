@@ -1,4 +1,5 @@
 import JobCard from "@/components/shared/JobCard";
+import ZeroItems from "@/components/shared/ZeroItems";
 import JobProTypes from "@/types/job";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -19,6 +20,7 @@ const JobPostsSection = () => {
   if (isError) {
     return <div>{error.message}</div>;
   }
+
   return (
     <section className="py-8">
       <h2>Current Job Postings</h2>
@@ -27,6 +29,7 @@ const JobPostsSection = () => {
           <Loader2 className="animate-spin" size={60} />
         </div>
       )}
+      {jobs?.length === 0 && <ZeroItems />}
       <div className="mt-4 flex flex-col gap-y-4">
         {jobs?.map((job: JobProTypes) => {
           return (
