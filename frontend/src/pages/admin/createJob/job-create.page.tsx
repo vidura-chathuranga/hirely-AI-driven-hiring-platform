@@ -5,11 +5,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { QueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-import { ChangeEvent, FormEvent, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ZodType, z } from "zod";
-import {zodResolver} from '@hookform/resolvers/zod';
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type Inputs = {
   title: string;
@@ -53,7 +52,7 @@ const JobCreatePage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm({
     defaultValues: {
       title: "",
@@ -64,60 +63,40 @@ const JobCreatePage = () => {
       q2: "",
       q3: "",
     },
-    resolver : zodResolver(jobPostSchema)
+    resolver: zodResolver(jobPostSchema),
   });
-
-  // const [formData, setFormData] = useState({
-  //   title: "",
-  //   description: "",
-  //   type: "",
-  //   location: "",
-  //   q1: "",
-  //   q2: "",
-  //   q3: "",
-  // });
 
   const queryClient = new QueryClient();
   const navigate = useNavigate();
 
-  // const { isPending, mutate: createJob } = useMutation({
-  //   mutationFn: async () => {
-  //     return axios.post("/api/jobs", formData).then((res) => res.data);
-  //   },
-  //   onSuccess: (newJob) => {
-  //     queryClient.setQueryData(["jobs", newJob._id], newJob);
-  //     navigate("/admin/jobs");
+  const { isPending, mutate: createJob } = useMutation({
+    mutationFn: async (data: Inputs) => {
+      console.log(data);
+      return axios.post("/api/jobs", data).then((res) => res.data);
+    },
+    onSuccess: (newJob) => {
+      queryClient.setQueryData(["jobs", newJob._id], newJob);
+      navigate("/admin/jobs");
 
-  //     // show success notification to the user
-  //     toast({
-  //       title: "Job posted Successfully",
-  //     });
-  //   },
-  //   onError: (error) => {
-  //     // show error to the user
-  //     toast({
-  //       title: "oops, There was an error",
-  //       description: error.message,
-  //       variant: "destructive",
-  //     });
-  //     console.log(error);
-  //   },
-  // });
+      // show success notification to the user
+      toast({
+        title: "Job posted Successfully",
+      });
+    },
+    onError: (error) => {
+      // show error to the user
+      toast({
+        title: "oops, There was an error",
+        description: error.message,
+        variant: "destructive",
+      });
+      console.log(error);
+    },
+  });
 
-  // const handleChange = (
-  //   e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  // ) => {
-  //   setFormData({ ...formData, [e.target.name]: e.target.value });
-  // };
-
-  // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-
-  //   // mutate the tenstack mutation function
-  //   createJob();
-  // };
-
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    createJob(data);
+  };
 
   return (
     <div>
@@ -127,70 +106,46 @@ const JobCreatePage = () => {
       <form className="py-8" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <h3>Title</h3>
-          <Input
-            type="text"
-            className="mt-2"
-            {...(register("title"))}
-          />
+          <Input type="text" className="mt-2" {...register("title")} />
           <span className="text-red-600">{errors?.title?.message}</span>
         </div>
         <div className="mt-4">
           <h3>Description</h3>
-          <Textarea
-            className="mt-2"
-            {...(register("description"))}
-          />
+          <Textarea className="mt-2" {...register("description")} />
           <span className="text-red-600">{errors?.description?.message}</span>
         </div>
         <div className="mt-4">
           <h3>Type</h3>
-          <Input
-            className="mt-2"
-            type="text"
-            {...(register("type"))}
-          />
+          <Input className="mt-2" type="text" {...register("type")} />
           <span className="text-red-600">{errors?.type?.message}</span>
         </div>
         <div className="mt-4">
           <h3>Location</h3>
-          <Input
-            className="mt-2"
-            type="text"
-            {...(register("location"))}
-          />
+          <Input className="mt-2" type="text" {...register("location")} />
           <span className="text-red-600">{errors?.location?.message}</span>
         </div>
         <div className="mt-4">
           <h3>Question 1</h3>
-          <Textarea
-            className="mt-2"
-            {...(register("q1"))}
-          />
+          <Textarea className="mt-2" {...register("q1")} />
           <span className="text-red-600">{errors?.q1?.message}</span>
         </div>
         <div className="mt-4">
           <h3>Question 2</h3>
-          <Textarea
-            className="mt-2"
-            {...(register("q2"))}
-          />
+          <Textarea className="mt-2" {...register("q2")} />
           <span className="text-red-600">{errors?.q2?.message}</span>
         </div>
         <div className="mt-4">
           <h3>Question 3</h3>
-          <Textarea
-            className="mt-2"
-            {...(register("q3"))}
-          />
+          <Textarea className="mt-2" {...register("q3")} />
           <span className="text-red-600">{errors?.q3?.message}</span>
         </div>
 
         <Button
           type="submit"
           className="mt-8 bg-card text-card-foreground flex gap-x-3"
-          disabled={isSubmitting}
+          disabled={isPending}
         >
-          {isSubmitting && <Loader2 className="animate-spin" />}
+          {isPending && <Loader2 className="animate-spin" />}
           Submit
         </Button>
       </form>
