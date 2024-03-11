@@ -29,7 +29,7 @@ const JobPostsSection = () => {
           <Loader2 className="animate-spin" size={60} />
         </div>
       )}
-      {jobs?.length === 0 && <ZeroItems />}
+      {jobs?.length === 0 && <ZeroItems isHome={false} />}
       <div className="mt-4 flex flex-col gap-y-4">
         {jobs?.map((job: JobProTypes) => {
           return (
