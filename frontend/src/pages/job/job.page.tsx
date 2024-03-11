@@ -4,12 +4,35 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth, useUser } from "@clerk/clerk-react";
-import { useQuery } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Briefcase, Loader2, MapPin } from "lucide-react";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
+import { z } from "zod";
 
+const jobApplicationSchema = z.object({
+  fullName: z.string().min(2, { message: "Insert valid name" }),
+  a2: z.string().min(5, { message: "Insert proper answer" }),
+  a1: z.string().min(5, { message: "Insert proper answer" }),
+  a3: z.string().min(5, { message: "Insert proper answer" }),
+});
+
+type JobApplication = {
+  fullName: string;
+  a1: string;
+  a2: string;
+  a3: string;
+};
+
+type JobApplicationWithUserData = {
+  fullName: string;
+  answers: string[];
+  userId: string | undefined;
+  job: string | undefined;
+};
 const JobPage = () => {
   // store session token Id
   const [tokenId, setTokenId] = useState<String | null>("");
@@ -28,11 +51,19 @@ const JobPage = () => {
   // toast hook
   const { toast } = useToast();
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    a1: "",
-    a2: "",
-    a3: "",
+  // create form using react useFrom hook
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      fullName: "",
+      a1: "",
+      a2: "",
+      a3: "",
+    },
+    resolver: zodResolver(jobApplicationSchema),
   });
 
   // useEffect to fetch the session Token ,
@@ -57,6 +88,35 @@ const JobPage = () => {
     queryFn: () => axios.get(`/api/jobs/${jobId}`).then((res) => res.data),
   });
 
+  const { isPending, mutate: submitJobApplication } = useMutation({
+    mutationFn: async (data: JobApplicationWithUserData) => {
+      console.log(data);
+      return axios
+        .post("/api/jobApplications", data, {
+          headers: {
+            Authorization: `Bearer ${tokenId}`,
+          },
+        })
+        .then((res) => res.data);
+    },
+    onSuccess: (_) => {
+      toast({
+        title: "Job application submitted successfully",
+      });
+
+      // navigate user to home page
+      navigate("/", { replace: true });
+    },
+    onError: (error: any) => {
+      // show error notification to the user
+      toast({
+        title: "Oops, There was an error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center">
@@ -71,46 +131,16 @@ const JobPage = () => {
     console.log(error.message);
   }
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  // handle submit Form
+  const submitApplication: SubmitHandler<JobApplication> = async (
+    formData: JobApplication
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    try {
-      await axios.post(
-        "/api/jobApplications",
-        {
-          fullName: formData.fullName,
-          answers: [formData.a1, formData.a2, formData.a3],
-          userId: user?.id,
-          job: jobId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenId}`,
-          },
-        }
-      );
-
-      // todo : show success message to the user
-
-      toast({
-        title: "Job application submitted successfully",
-      });
-      // navigate user to home page
-      navigate("/", { replace: true });
-    } catch (error: any) {
-      // todo : show error notification to the user
-      toast({
-        title: "Oops, There was an error",
-        description: error?.error || error?.data?.message,
-        variant: "destructive",
-      });
-    }
+    submitJobApplication({
+      fullName: formData.fullName,
+      answers: [formData.a1, formData.a2, formData.a3],
+      userId: user?.id,
+      job: jobId,
+    });
   };
   return (
     <div>
@@ -131,36 +161,31 @@ const JobPage = () => {
         <p>{job?.description}</p>
       </div>
       <Separator />
-      <form className="py-8" onSubmit={handleSubmit}>
+      <form
+        className="py-8"
+        onSubmit={handleSubmit((data) => submitApplication(data))}
+      >
         <div>
           <h3>Full Name</h3>
-          <Input
-            className="mt-2"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
-          />
+          <Input className="mt-2" {...register("fullName")} />
+          <span className="text-red-600">{errors?.fullName?.message}</span>
         </div>
 
         {/* job questions */}
-        {job.questions.map((ques: string[], index: number) => (
+        {job.questions.map((ques: string, index: number) => (
           <div key={index} className="mt-4">
             <h3>{ques}</h3>
-            <Textarea
-              className="mt-2"
-              name={`a${index + 1}`}
-              //   value={
-              //     formData[
-              //       `a${index + 1}` as keyof Omit<keyof formData, "fullName">
-              //     ]
-              //   }
-              onChange={handleChange}
-              required
-            />
+            <Textarea className="mt-2" {...register(`a${index + 1}` as any)} />
+            <span className="text-red-600">
+              {errors.a1?.message || errors.a2?.message || errors.a3?.message}
+            </span>
           </div>
         ))}
-        <Button type="submit" className="mt-8 bg-card text-card-foreground">
+        <Button
+          type="submit"
+          className="mt-8 bg-card text-card-foreground"
+          disabled={isPending}
+        >
           Submit
         </Button>
       </form>
