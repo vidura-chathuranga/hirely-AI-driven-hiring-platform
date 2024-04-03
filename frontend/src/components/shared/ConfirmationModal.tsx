@@ -12,15 +12,20 @@ import {
 type confirmModalProps = {
   open: true | false;
   setOpen: (isOpen: boolean) => void;
+  handleDeleteJob: () => void;
 };
-const ConfirmationModal = ({ open, setOpen }: confirmModalProps) => {
+const ConfirmationModal = ({
+  open,
+  setOpen,
+  handleDeleteJob,
+}: confirmModalProps) => {
   return (
     <AlertDialog open={open}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete vacany
+            This action cannot be undone. This will permanently delete vacancy
             and remove vacancy data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -28,7 +33,9 @@ const ConfirmationModal = ({ open, setOpen }: confirmModalProps) => {
           <AlertDialogCancel onClick={() => setOpen(false)}>
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={handleDeleteJob}>
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

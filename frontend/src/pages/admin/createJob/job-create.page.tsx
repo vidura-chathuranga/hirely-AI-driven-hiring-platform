@@ -9,6 +9,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 
 type Inputs = {
   title: string;
@@ -45,6 +47,24 @@ const jobPostSchema: ZodType<Inputs> = z.object({
 });
 
 const JobCreatePage = () => {
+  const [userToken, setUserToken] = useState<String | null>(null);
+
+  // get the user Token
+  const { getToken, userId } = useAuth();
+
+  // get user data
+  const { user } = useUser();
+
+  useEffect(() => {
+    const fetchUserToken = async () => {
+      const token = await getToken();
+
+      setUserToken(token);
+    };
+
+    fetchUserToken();
+  }, []);
+
   // toast hook
   const { toast } = useToast();
 
@@ -72,10 +92,24 @@ const JobCreatePage = () => {
   const { isPending, mutate: createJob } = useMutation({
     mutationFn: async (data: Inputs) => {
       console.log(data);
-      return axios.post("/api/jobs", data).then((res) => res.data);
+      return axios
+        .post(
+          "/api/jobs",
+          { ...data, userId },
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+            params: {
+              role: user?.publicMetadata.role,
+            },
+          }
+        )
+        .then((res) => res.data);
     },
     onSuccess: (newJob) => {
       queryClient.setQueryData(["jobs", newJob._id], newJob);
+      queryClient.setQueryData(["jobs", "admin"], newJob);
       navigate("/admin/jobs");
 
       // show success notification to the user

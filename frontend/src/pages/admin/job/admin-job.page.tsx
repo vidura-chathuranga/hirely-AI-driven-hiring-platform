@@ -24,7 +24,7 @@ const JobPage = () => {
   const { getToken } = useAuth();
 
   // get user data
-  const {user} = useUser();
+  const { user } = useUser();
 
   useEffect(() => {
     const fetchUserToken = async () => {
@@ -36,6 +36,7 @@ const JobPage = () => {
     fetchUserToken();
   }, []);
 
+  console.log(user);
   const {
     isLoading,
     isError,
@@ -57,12 +58,12 @@ const JobPage = () => {
       axios
         .get(`/api/jobApplications/job/${jobId}`, {
           headers: { Authorization: `Bearer ${userToken}` },
-          params : {
-            role : user?.publicMetadata.role
-          }
+          params: {
+            role: user?.publicMetadata.role,
+          },
         })
         .then((res) => res.data),
-    enabled : userToken !== null
+    enabled: userToken !== null,
   });
 
   // if the page is Loading we show the loader
@@ -77,13 +78,6 @@ const JobPage = () => {
   if (isError) {
     return <div>Jobs Fetching Error : {error.message}</div>;
   }
-  // const jobApplications = [
-  //   {
-  //     _id: "1",
-  //     fullName: "Vidura Chathuranga",
-  //     jobId: "xyz",
-  //   },
-  // ];
   return (
     <div>
       <div>

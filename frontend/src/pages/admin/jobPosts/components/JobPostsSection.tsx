@@ -1,12 +1,30 @@
 import JobCard from "@/components/shared/JobCard";
 import ZeroItems from "@/components/shared/ZeroItems";
 import JobProTypes from "@/types/job";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const JobPostsSection = () => {
-  //
+  const [userToken, setUserToken] = useState<String | null>(null);
+
+  // get the user Token
+  const { getToken, userId, isLoaded } = useAuth();
+
+  // get user data
+  const { user } = useUser();
+
+  useEffect(() => {
+    const fetchUserToken = async () => {
+      const token = await getToken();
+
+      setUserToken(token);
+    };
+
+    fetchUserToken();
+  }, []);
   const {
     isLoading,
     error,
@@ -14,9 +32,27 @@ const JobPostsSection = () => {
     data: jobs,
   } = useQuery({
     queryKey: ["jobs", "admin"],
-    queryFn: () => axios.get("/api/jobs").then((res) => res.data),
+    queryFn: () =>
+      axios
+        .get(`/api/jobs/admin/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+          params: {
+            role: user?.publicMetadata.role,
+          },
+        })
+        .then((res) => res.data),
+    enabled: isLoaded,
   });
 
+  if (isLoading || !isLoaded) {
+    return (
+      <div className="h-full flex justify-center items-center">
+        <Loader2 size={30} className="animate-spin" />
+      </div>
+    );
+  }
   if (isError) {
     return <div>{error.message}</div>;
   }
