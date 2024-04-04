@@ -9,6 +9,7 @@ import {
 import AuthorizationMiddleware from "./middlewares/AuthorizationMiddleware";
 import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
 
+
 const jobsRouter = express.Router();
 
 jobsRouter

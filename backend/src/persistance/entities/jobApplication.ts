@@ -18,6 +18,10 @@ const jobApplication = new mongoose.Schema({
     type: [String],
     required: true,
   },
+  cv: {
+    type: String,
+    required: true,
+  },
   ratings: { type: String },
 });
 

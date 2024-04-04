@@ -18,6 +18,14 @@ const jobApplicationSchema = z.object({
   a2: z.string().min(5, { message: "Insert proper answer" }),
   a1: z.string().min(5, { message: "Insert proper answer" }),
   a3: z.string().min(5, { message: "Insert proper answer" }),
+  cv: z
+    .any()
+    .refine((val) => val !== null, {
+      message: "file is required",
+    })
+    .refine((val) => val === null || val.size < 2000000, {
+      message: "maximum file size : 2MB",
+    }),
 });
 
 type JobApplication = {
@@ -25,6 +33,7 @@ type JobApplication = {
   a1: string;
   a2: string;
   a3: string;
+  cv: null | File;
 };
 
 type JobApplicationWithUserData = {
@@ -32,6 +41,7 @@ type JobApplicationWithUserData = {
   answers: string[];
   userId: string | undefined;
   job: string | undefined;
+  cv: null | File;
 };
 const JobPage = () => {
   // store session token Id
@@ -55,6 +65,8 @@ const JobPage = () => {
   const {
     register,
     handleSubmit,
+    setValue,
+    setError,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -62,6 +74,7 @@ const JobPage = () => {
       a1: "",
       a2: "",
       a3: "",
+      cv: null,
     },
     resolver: zodResolver(jobApplicationSchema),
   });
@@ -89,12 +102,13 @@ const JobPage = () => {
   });
 
   const { isPending, mutate: submitJobApplication } = useMutation({
-    mutationFn: async (data: JobApplicationWithUserData) => {
+    mutationFn: async (data: any) => {
       console.log(data);
       return axios
         .post("/api/jobApplications", data, {
           headers: {
             Authorization: `Bearer ${tokenId}`,
+            "Content-Type": "multipart/form-data",
           },
         })
         .then((res) => res.data);
@@ -133,14 +147,46 @@ const JobPage = () => {
 
   // handle submit Form
   const submitApplication: SubmitHandler<JobApplication> = async (
-    formData: JobApplication
+    submitData: JobApplication
   ) => {
-    submitJobApplication({
-      fullName: formData.fullName,
-      answers: [formData.a1, formData.a2, formData.a3],
+    const formObj = {
+      fullName: submitData.fullName,
+      answers: [submitData.a1, submitData.a2, submitData.a3],
       userId: user?.id,
       job: jobId,
-    });
+    };
+    let formData = new FormData();
+    // const json = JSON.stringify(formObj);
+    // const blob = new Blob([json], { type: "application/json" });
+
+    formData.append("fullName", submitData.fullName);
+    formData.append(
+      "answers",
+      JSON.stringify([submitData.a1, submitData.a2, submitData.a3])
+    );
+    formData.append("userId", user?.id!!);
+    formData.append("job", jobId!!);
+
+    if (submitData.cv instanceof File) {
+      formData.append("file", submitData.cv);
+    }
+    // submitJobApplication({
+    //   fullName: submitData.fullName,
+    //   answers: [submitData.a1, submitData.a2, submitData.a3],
+    //   userId: user?.id,
+    //   job: jobId,
+    //   cv: submitData.cv,
+    // });
+
+    submitJobApplication(formData);
+  };
+
+  // file change handler
+  const onFileChangeHandler = (e: any) => {
+    if (errors.cv) {
+      setError("cv", { message: "" });
+    }
+    setValue("cv", e.target.files[0]);
   };
   return (
     <div>
@@ -181,6 +227,15 @@ const JobPage = () => {
             </span>
           </div>
         ))}
+        <div>
+          <h3 className="my-3">Attach your Curriculum Vitae :</h3>
+          <Input
+            type="file"
+            accept="application/pdf"
+            onChange={(e) => onFileChangeHandler(e)}
+          />
+          <span className="text-red-600">{errors.cv?.message}</span>
+        </div>
         <Button
           type="submit"
           className="mt-8 bg-card text-card-foreground"

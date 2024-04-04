@@ -14,20 +14,22 @@ export const createJobApplication = async (
     if (!userId || !fullName || !job || !answers) {
       throw new Error("All fields are required");
     }
+
+    const convertedAnswerObj = JSON.parse(answers);
+
     const createdApplication = await JobApplication.create({
       userId,
       fullName,
       job,
-      answers,
+      answers: convertedAnswerObj,
       ratings,
+      cv: req.file?.path,
     });
-
     // call to the generateRating method
     await generateRating(createdApplication._id);
-
     res.status(201).json(createdApplication);
-  } catch (error : any) {
-    console.log(error.message)
+  } catch (error: any) {
+    console.log(error.message);
     next(error);
   }
 };
@@ -78,8 +80,8 @@ export const getJobApplicationById = async (
       throw new NotFoundError("Job application not found");
     }
     res.status(200).json(jobApplication);
-  } catch (error:any) {
-    console.log(error.message)
+  } catch (error: any) {
+    console.log(error.message);
     next(error);
   }
 };
