@@ -25,6 +25,9 @@ const jobApplicationSchema = z.object({
     })
     .refine((val) => val === null || val.size < 2000000, {
       message: "maximum file size : 2MB",
+    })
+    .refine((val) => val === null || val.type === "application/pdf", {
+      message: "Only PDF files are accepted",
     }),
 });
 
@@ -96,7 +99,6 @@ const JobPage = () => {
 
   const { isPending, mutate: submitJobApplication } = useMutation({
     mutationFn: async (data: any) => {
-      console.log(data);
       return axios
         .post("/api/jobApplications", data, {
           headers: {
