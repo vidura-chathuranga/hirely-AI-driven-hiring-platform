@@ -68,6 +68,9 @@ const AdminJobApplicationPage = () => {
     return <div>Job application Fetching Error : {error.message}</div>;
   }
 
+  const handleOpenNewWindow = () => {
+    window.open(`/${jobApplication?.cv}`,"_blank","noreferrer")
+  }
   return (
     <div className="flex flex-col gap-y-4 ">
       <Card className="bg-foreground">
@@ -112,6 +115,7 @@ const AdminJobApplicationPage = () => {
                   <Eye
                     color="blue"
                     className="transition-transform duration-5000 ease-in-out relative hover:-translate-y-1 text-brown"
+                    onClick={handleOpenNewWindow}
                   />
                 </TooltipTrigger>
                 <TooltipContent>View CV</TooltipContent>
