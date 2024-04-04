@@ -36,13 +36,6 @@ type JobApplication = {
   cv: null | File;
 };
 
-type JobApplicationWithUserData = {
-  fullName: string;
-  answers: string[];
-  userId: string | undefined;
-  job: string | undefined;
-  cv: null | File;
-};
 const JobPage = () => {
   // store session token Id
   const [tokenId, setTokenId] = useState<String | null>("");
@@ -149,15 +142,7 @@ const JobPage = () => {
   const submitApplication: SubmitHandler<JobApplication> = async (
     submitData: JobApplication
   ) => {
-    const formObj = {
-      fullName: submitData.fullName,
-      answers: [submitData.a1, submitData.a2, submitData.a3],
-      userId: user?.id,
-      job: jobId,
-    };
     let formData = new FormData();
-    // const json = JSON.stringify(formObj);
-    // const blob = new Blob([json], { type: "application/json" });
 
     formData.append("fullName", submitData.fullName);
     formData.append(
@@ -170,13 +155,6 @@ const JobPage = () => {
     if (submitData.cv instanceof File) {
       formData.append("file", submitData.cv);
     }
-    // submitJobApplication({
-    //   fullName: submitData.fullName,
-    //   answers: [submitData.a1, submitData.a2, submitData.a3],
-    //   userId: user?.id,
-    //   job: jobId,
-    //   cv: submitData.cv,
-    // });
 
     submitJobApplication(formData);
   };
