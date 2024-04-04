@@ -22,6 +22,11 @@ const jobApplication = new mongoose.Schema({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    required: true,
+    default: "NONE",
+  },
   ratings: { type: String },
 });
 

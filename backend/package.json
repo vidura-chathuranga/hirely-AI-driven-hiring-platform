@@ -22,12 +22,14 @@
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^4.13.9",
+    "@types/nodemailer": "^6.4.14",
     "cors": "^2.8.5",
     "dotenv": "^16.4.1",
     "express": "^4.18.2",
     "mongodb": "^6.3.0",
     "mongoose": "^8.1.1",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.13",
     "openai": "^4.28.0"
   }
 }

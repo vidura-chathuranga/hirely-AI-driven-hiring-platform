@@ -4,6 +4,8 @@ import {
   getAllJobApplications,
   getJobApplicationById,
   getJobApplicationByJobId,
+  sendRejectedEmail,
+  sendShortListedEmail,
 } from "../application/features/jobApplications";
 import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
 import AuthorizationMiddleware from "./middlewares/AuthorizationMiddleware";
@@ -23,16 +25,13 @@ const upload = multer({ storage: storage });
 
 const jobAppplicationRouter = express.Router();
 
-jobAppplicationRouter.route("/").post(
-  ClerkExpressRequireAuth({}),
-  upload.single("file"),
-  createJobApplication
-);
-// .get(
-//   ClerkExpressRequireAuth({}),
-//   AuthorizationMiddleware,
-//   getAllJobApplications
-// );
+jobAppplicationRouter
+  .route("/")
+  .post(
+    ClerkExpressRequireAuth({}),
+    upload.single("file"),
+    createJobApplication
+  );
 
 jobAppplicationRouter
   .route("/job/:id")
@@ -48,5 +47,8 @@ jobAppplicationRouter
     AuthorizationMiddleware,
     getJobApplicationById
   );
+
+jobAppplicationRouter.put("/:id/accept-email", sendShortListedEmail);
+jobAppplicationRouter.put("/:id/reject-email", sendRejectedEmail);
 
 export default jobAppplicationRouter;

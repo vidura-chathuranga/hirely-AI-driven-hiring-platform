@@ -2,6 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import JobApplication from "../../persistance/entities/jobApplication";
 import NotFoundError from "../../domain/errors/not-found-error";
 import { generateRating } from "./ratings";
+import Job from "../../persistance/entities/jobs";
+import sendShortListMail from "../../utils/sendEmail";
+import sendEmail from "../../utils/sendEmail";
 
 export const createJobApplication = async (
   req: Request,
@@ -82,6 +85,80 @@ export const getJobApplicationById = async (
     res.status(200).json(jobApplication);
   } catch (error: any) {
     console.log(error.message);
+    next(error);
+  }
+};
+
+export const sendShortListedEmail = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // get applicationId
+  const { id: applicationId } = req.params;
+  const { fullName, jobId, email } = req.body;
+  try {
+    //get the job details from DB
+    const job = await Job.findById(jobId);
+
+    if (!job) {
+      throw new NotFoundError("Job does not exists");
+    }
+
+    // update job application status
+    const updatedApplication = await JobApplication.findByIdAndUpdate(
+      applicationId,
+      {
+        status: "SHORTLISTED",
+      },
+      { new: true }
+    );
+
+    // call to email sending function
+    sendEmail(email, fullName, job.title, "SHORTLISTED");
+
+    // send success message along with data
+    res
+      .status(200)
+      .json({ message: "Email was sent", application: updatedApplication });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const sendRejectedEmail = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // get applicationId
+  const { id: applicationId } = req.params;
+  const { fullName, jobId, email } = req.body;
+  try {
+    //get the job details from DB
+    const job = await Job.findById(jobId);
+
+    if (!job) {
+      throw new NotFoundError("Job does not exists");
+    }
+
+    // update job application status
+    const updatedApplication = await JobApplication.findByIdAndUpdate(
+      applicationId,
+      {
+        status: "REJECTED",
+      },
+      { new: true }
+    );
+
+    // call to email sending function
+    sendEmail(email, fullName, job.title, "REJECTED");
+
+    // send success message along with data
+    res
+      .status(200)
+      .json({ message: "Email was sent", application: updatedApplication });
+  } catch (error) {
     next(error);
   }
 };

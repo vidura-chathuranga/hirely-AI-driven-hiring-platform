@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { useAuth, useUser } from "@clerk/clerk-react";
 import {
@@ -19,12 +20,13 @@ const AdminJobApplicationPage = () => {
   const { id: jobId, applicationId } = useParams();
 
   const [userToken, setUserToken] = useState<String | null>(null);
-
   // get the user Token
   const { getToken } = useAuth();
 
   // get user data
   const { user } = useUser();
+
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchUserToken = async () => {
@@ -69,8 +71,56 @@ const AdminJobApplicationPage = () => {
   }
 
   const handleOpenNewWindow = () => {
-    window.open(`/${jobApplication?.cv}`,"_blank","noreferrer")
-  }
+    window.open(`/${jobApplication?.cv}`, "_blank", "noreferrer");
+  };
+
+  const handleAcceptCV = async () => {
+    try {
+      const res = await axios.put(
+        `/api/jobApplications/${applicationId}/accept-email`,
+        {
+          fullName: jobApplication?.fullName,
+          jobId: jobApplication?.job,
+          email: user?.emailAddresses[0].emailAddress,
+        }
+      );
+      // show success notification to the user
+      toast({
+        title: res.data.message,
+      });
+    } catch (error: any) {
+      // show error to the user
+      toast({
+        title: "oops, There was an error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRejectCV = async () => {
+    try {
+      const res = await axios.put(
+        `/api/jobApplications/${applicationId}/reject-email`,
+        {
+          fullName: jobApplication?.fullName,
+          jobId: jobApplication?.job,
+          email: user?.emailAddresses[0].emailAddress,
+        }
+      );
+      // show success notification to the user
+      toast({
+        title: res.data.message,
+      });
+    } catch (error: any) {
+      // show error to the user
+      toast({
+        title: "oops, There was an error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
   return (
     <div className="flex flex-col gap-y-4 ">
       <Card className="bg-foreground">
@@ -124,12 +174,11 @@ const AdminJobApplicationPage = () => {
             <TooltipProvider delayDuration={200}>
               <Tooltip>
                 <TooltipTrigger>
-                  <a href="#">
-                    <CheckCheck
-                      color="green"
-                      className="transition-transform duration-5000 ease-in-out relative hover:-translate-y-1 text-brown"
-                    />
-                  </a>
+                  <CheckCheck
+                    color="green"
+                    className="transition-transform duration-5000 ease-in-out relative hover:-translate-y-1 text-brown"
+                    onClick={handleAcceptCV}
+                  />
                 </TooltipTrigger>
                 <TooltipContent>Accept CV</TooltipContent>
               </Tooltip>
@@ -140,6 +189,7 @@ const AdminJobApplicationPage = () => {
                   <X
                     color="red"
                     className="transition-transform duration-5000 ease-in-out relative hover:-translate-y-1 text-brown"
+                    onClick={handleRejectCV}
                   />
                 </TooltipTrigger>
                 <TooltipContent>Reject CV</TooltipContent>
